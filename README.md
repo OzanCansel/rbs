@@ -1,0 +1,2 @@
+# bs
+Binary Serialization Library
