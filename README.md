@@ -1,2 +1,2 @@
-# bs
-Binary Serialization Library
+# rbs
+Raw binary serialization library
