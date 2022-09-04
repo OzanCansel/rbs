@@ -34,8 +34,8 @@ stream<E , OwnsBuffer>::stream( std::streambuf& b )
 }
 
 template<endian E , bool OwnsBuffer>
-stream<E , OwnsBuffer>::stream( std::ios& os )
-    :   stream<E , OwnsBuffer> { *os.rdbuf() }
+stream<E , OwnsBuffer>::stream( std::ios& ios )
+    :   stream<E , OwnsBuffer> { *ios.rdbuf() }
 {}
 
 template<endian E , bool OwnsBuffer>
@@ -60,17 +60,17 @@ void stream<E , OwnsBuffer>::write( const T& val )
         {
             T    value;
             char data[ sizeof( T ) ];
-        } mem;
+        } memory;
 
-        mem.value = val;
+        memory.value = val;
 
         std::reverse(
-            std::begin( mem.data ) ,
-            std::end( mem.data )
+            std::begin( memory.data ) ,
+            std::end( memory.data )
         );
 
         m_buffer.sputn(
-            reinterpret_cast<char*>( &mem.data ) ,
+            reinterpret_cast<char*>( &memory.data ) ,
             sizeof( T )
         );
     }
@@ -78,7 +78,7 @@ void stream<E , OwnsBuffer>::write( const T& val )
 
 template<endian E , bool OwnsBuffer>
 template<typename T>
-void stream<E , OwnsBuffer>::read( T& val )
+void stream<E , OwnsBuffer>::read( T& value )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
@@ -88,22 +88,22 @@ void stream<E , OwnsBuffer>::read( T& val )
     if constexpr ( E == endian::native )
     {
         m_buffer.sgetn(
-            reinterpret_cast<char*>( &val ) ,
+            reinterpret_cast<char*>( &value ) ,
             sizeof( T )
         );
     }
     else
     {
-        auto beg = reinterpret_cast<char*>( &val );
+        auto beginning = reinterpret_cast<char*>( &value );
 
         m_buffer.sgetn(
-            beg ,
+            beginning ,
             sizeof( T )
         );
 
         std::reverse(
-            beg ,
-            beg + sizeof( val )
+            beginning ,
+            beginning + sizeof( value )
         );
     }
 }
@@ -111,9 +111,9 @@ void stream<E , OwnsBuffer>::read( T& val )
 template<endian E , bool OwnsBuffer , typename T>
 inline
 std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator<<( stream<E , OwnsBuffer>& ss , const T& val )
+operator<<( stream<E , OwnsBuffer>& ss , const T& value )
 {
-    ss.write( val );
+    ss.write( value );
 
     return ss;
 }
@@ -121,9 +121,9 @@ operator<<( stream<E , OwnsBuffer>& ss , const T& val )
 template<endian E , bool OwnsBuffer , typename T>
 inline
 std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator>>( stream<E , OwnsBuffer>& ss , T& val )
+operator>>( stream<E , OwnsBuffer>& ss , T& value )
 {
-    ss.read( val );
+    ss.read( value );
 
     return ss;
 }

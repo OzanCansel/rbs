@@ -17,12 +17,12 @@ namespace impl
     {
         using buffer  = boost::asio::streambuf;
 
-        buffer&       buf()       { return m_strbuf; };
-        const buffer& buf() const { return m_strbuf; };
+        buffer&       buf()       { return m_buf; };
+        const buffer& buf() const { return m_buf; };
 
-        protected:
+    protected:
 
-            buffer m_strbuf;
+        buffer m_buf;
     };
 }
 
@@ -42,7 +42,6 @@ enum class endian
 template<endian E , bool OwnBuffer>
 class stream : public impl::conditional_buffer<OwnBuffer>
 {
-
 public:
 
     inline stream();
