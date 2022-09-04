@@ -14,7 +14,6 @@ enum class operating_system : std::uint16_t
     win
 };
 
-
 enum class byte_order
 {
     little = 30 ,

@@ -16,7 +16,7 @@ rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const coordinate& c
 
 int main()
 {
-    std::ofstream of { "coordinate.bin" };
+    std::ofstream  of  { "coordinate.bin" };
     rbs::be_stream out { of };
 
     coordinate c { 1 , 2 , 3 };
