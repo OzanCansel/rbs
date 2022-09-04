@@ -503,3 +503,87 @@ TEST_CASE( "Read le double" )
 
     REQUIRE( value == memory.val );
 }
+
+TEST_CASE( "Read nt short" )
+{
+    rbs::nt_stream::buffer buffer;
+
+    union
+    {
+        short val { 0x0123 };
+        char  data[ sizeof( short ) ];
+    } memory;
+
+    buffer.sputn( memory.data , sizeof( memory.data ) );
+
+    rbs::nt_stream ss { buffer };
+
+    short val;
+
+    ss >> val;
+
+    REQUIRE( val == 0x0123 );
+}
+
+TEST_CASE( "Read nt int" )
+{
+    rbs::nt_stream::buffer buffer;
+
+    union
+    {
+        int  val { 0x01234567 };
+        char data[ sizeof( int ) ];
+    } memory;
+
+    buffer.sputn( memory.data , sizeof( memory.data ) );
+
+    rbs::nt_stream ss { buffer };
+
+    int val;
+
+    ss >> val;
+
+    REQUIRE( val == 0x01234567 );
+}
+
+TEST_CASE( "Read nt float" )
+{
+    union
+    {
+        float val { 1234.5678f };
+        char  data[ sizeof( float ) ];
+    } memory;
+
+    rbs::nt_stream::buffer buffer;
+
+    buffer.sputn( memory.data , sizeof( memory.data ) );
+
+    rbs::nt_stream ss { buffer };
+
+    float value;
+
+    ss >> value;
+
+    REQUIRE( value == memory.val );
+}
+
+TEST_CASE( "Read nt double" )
+{
+    union
+    {
+        double val { 1234.5678 };
+        char   data[ sizeof( double ) ];
+    } memory;
+
+    rbs::nt_stream::buffer buffer;
+
+    buffer.sputn( memory.data , sizeof( memory.data ) );
+
+    rbs::nt_stream ss { buffer };
+
+    double value;
+
+    ss >> value;
+
+    REQUIRE( value == memory.val );
+}
