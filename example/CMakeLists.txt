@@ -17,3 +17,13 @@ target_link_libraries(
 
         rbs::rbs
 )
+
+add_executable( enum enum.cpp helper.hpp )
+
+target_link_libraries(
+    enum
+
+    PRIVATE
+
+        rbs::rbs
+)
