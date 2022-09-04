@@ -10,7 +10,7 @@
 - Header only library
 - Usable with `find_package( rbs REQUIRED )` if it is installed to the system
 - Needs C++17 or higher
-- Has Boost.Asio dependency
+- Only `Boost.Asio` dependency
 
 ## Examples
 All examples use `helper.hpp` to print bytes. Here its content is :
