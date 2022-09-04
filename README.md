@@ -270,3 +270,6 @@ add_executable( my_binary main.cpp )
 
 target_link_libraries( my_binary PRIVATE rbs::rbs )
 ```
+
+# LICENSE
+[MIT](https://raw.githubusercontent.com/OzanCansel/rbs/master/LICENSE)
