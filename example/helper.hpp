@@ -7,7 +7,7 @@
 #include <rbs/stream.hpp>
 
 template<rbs::endian E>
-inline void print( std::string_view prefix , rbs::stream<E>& ss )
+inline void print( std::string_view prefix , rbs::stream<E , true>& ss )
 {
     std::cout << prefix << " | ";
 

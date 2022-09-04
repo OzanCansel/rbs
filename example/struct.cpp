@@ -9,8 +9,8 @@ struct coordinate
     float z;
 };
 
-template<rbs::endian E>
-inline rbs::stream<E>& operator<<( rbs::stream<E>& ss , const coordinate& coord )
+template<auto... Args>
+inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const coordinate& coord )
 {
     return ss << coord.x << coord.y << coord.z;
 }

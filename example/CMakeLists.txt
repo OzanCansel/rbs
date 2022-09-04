@@ -27,3 +27,13 @@ target_link_libraries(
 
         rbs::rbs
 )
+
+add_executable( file-out file-out.cpp )
+
+target_link_libraries(
+    file-out
+
+    PRIVATE
+
+        rbs::rbs
+)

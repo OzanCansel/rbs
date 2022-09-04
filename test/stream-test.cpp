@@ -277,7 +277,7 @@ TEST_CASE( "write a native double" )
 
 TEST_CASE( "stream<E>::buffer as reference" )
 {
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
     rbs::nt_stream ss { buffer };
 
     ss << 1;
@@ -287,7 +287,7 @@ TEST_CASE( "stream<E>::buffer as reference" )
 
 TEST_CASE( "Read char" )
 {
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputc( 0xAB );
 
@@ -302,7 +302,7 @@ TEST_CASE( "Read char" )
 
 TEST_CASE( "Read be short" )
 {
-    rbs::be_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputc( 0x0B );
     buffer.sputc( 0xCD );
@@ -318,7 +318,7 @@ TEST_CASE( "Read be short" )
 
 TEST_CASE( "Read be int" )
 {
-    rbs::be_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputc( 0x01 );
     buffer.sputc( 0x23 );
@@ -343,7 +343,7 @@ TEST_CASE( "Read be float" )
         char  data[ sizeof( float ) ];
     } memory;
 
-    rbs::be_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     std::copy(
         std::begin( memory.data ) ,
@@ -377,7 +377,7 @@ TEST_CASE( "Read be double" )
         char   data[ sizeof( double ) ];
     } memory;
 
-    rbs::be_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     std::copy(
         std::begin( memory.data ) ,
@@ -404,7 +404,7 @@ TEST_CASE( "Read be double" )
 
 TEST_CASE( "Read le short" )
 {
-    rbs::le_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputc( 0xCD );
     buffer.sputc( 0x0B );
@@ -420,7 +420,7 @@ TEST_CASE( "Read le short" )
 
 TEST_CASE( "Read le int" )
 {
-    rbs::le_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputc( 0x67 );
     buffer.sputc( 0x45 );
@@ -445,7 +445,7 @@ TEST_CASE( "Read le float" )
         char  data[ sizeof( float ) ];
     } memory;
 
-    rbs::le_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     std::copy(
         std::begin( memory.data ) ,
@@ -479,7 +479,7 @@ TEST_CASE( "Read le double" )
         char   data[ sizeof( double ) ];
     } memory;
 
-    rbs::le_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     std::copy(
         std::begin( memory.data ) ,
@@ -506,7 +506,7 @@ TEST_CASE( "Read le double" )
 
 TEST_CASE( "Read nt short" )
 {
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     union
     {
@@ -527,7 +527,7 @@ TEST_CASE( "Read nt short" )
 
 TEST_CASE( "Read nt int" )
 {
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     union
     {
@@ -554,7 +554,7 @@ TEST_CASE( "Read nt float" )
         char  data[ sizeof( float ) ];
     } memory;
 
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 
@@ -575,7 +575,7 @@ TEST_CASE( "Read nt double" )
         char   data[ sizeof( double ) ];
     } memory;
 
-    rbs::nt_stream::buffer buffer;
+    boost::asio::streambuf buffer;
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 

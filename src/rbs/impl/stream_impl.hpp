@@ -19,27 +19,35 @@ namespace impl
     constexpr auto suitable_to_rw_v = suitable_to_rw<T>::value;
 }
 
-template<endian E>
-stream<E>::stream()
-    :   m_opt_buf { std::in_place_t {} }
-    ,   m_buffer { *m_opt_buf }
+template<endian E , bool OwnsBuffer>
+stream<E , OwnsBuffer>::stream()
+    :   m_buffer { impl::conditional_buffer<OwnsBuffer>::buf() }
+{
+    static_assert( OwnsBuffer );
+}
+
+template<endian E , bool OwnsBuffer>
+stream<E , OwnsBuffer>::stream( std::streambuf& b )
+    :   m_buffer { b }
+{
+    static_assert( !OwnsBuffer );
+}
+
+template<endian E , bool OwnsBuffer>
+stream<E , OwnsBuffer>::stream( std::ios& os )
+    :   stream<E , OwnsBuffer> { *os.rdbuf() }
 {}
 
-template<endian E>
-stream<E>::stream( buffer& buf )
-    :   m_buffer { buf }
-{}
-
-template<endian E>
+template<endian E , bool OwnsBuffer>
 template<typename T>
-void stream<E>::write( const T& val )
+void stream<E , OwnsBuffer>::write( const T& val )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
-        "T must be primitive type"
+        "T must be a primitive type"
     );
 
-    if ( E == endian::native )
+    if constexpr ( E == endian::native )
     {
         m_buffer.sputn(
             reinterpret_cast<const char*>( &val ) ,
@@ -68,16 +76,16 @@ void stream<E>::write( const T& val )
     }
 }
 
-template<endian E>
+template<endian E , bool OwnsBuffer>
 template<typename T>
-void stream<E>::read( T& val )
+void stream<E , OwnsBuffer>::read( T& val )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
-        "T must be primitive type"
+        "T must be a primitive type"
     );
 
-    if ( E == endian::native )
+    if constexpr ( E == endian::native )
     {
         m_buffer.sgetn(
             reinterpret_cast<char*>( &val ) ,
@@ -100,28 +108,20 @@ void stream<E>::read( T& val )
     }
 }
 
-template<endian E>
-typename stream<E>::buffer& stream<E>::buf()
-{
-    return m_buffer;
-}
-
-template<endian E>
-const typename stream<E>::buffer& stream<E>::buf() const
-{
-    return m_buffer;
-}
-
-template<endian E , typename T , typename = std::enable_if_t<impl::suitable_to_rw_v<T>>>
-inline stream<E>& operator<<( stream<E>& ss , const T& val )
+template<endian E , bool OwnsBuffer , typename T>
+inline
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
+operator<<( stream<E , OwnsBuffer>& ss , const T& val )
 {
     ss.write( val );
 
     return ss;
 }
 
-template<endian E , typename T , typename = std::enable_if_t<impl::suitable_to_rw_v<T>>>
-inline stream<E>& operator>>( stream<E>& ss , T& val )
+template<endian E , bool OwnsBuffer , typename T>
+inline
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
+operator>>( stream<E , OwnsBuffer>& ss , T& val )
 {
     ss.read( val );
 

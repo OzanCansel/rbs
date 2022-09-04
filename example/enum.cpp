@@ -28,8 +28,8 @@ struct computer
     byte_order       endianness;
 };
 
-template<rbs::endian E>
-inline rbs::stream<E>& operator<<( rbs::stream<E>& ss , const computer& comp )
+template<auto... Args>
+inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const computer& comp )
 {
     return ss << comp.arch << comp.sys << comp.endianness;
 }
