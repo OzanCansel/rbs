@@ -188,7 +188,7 @@ computer -> little | 0b 14 00 1e 00 00 00
 ```
 
 ### File Output Example
-`rbs` is able to work with standard streams such as [std::ofstream](https://en.cppreference.com/w/cpp/io/basic_ofstream). This examples writes serialized `coordinate` object to the `coordinate.bin` file.
+`rbs` is able to work with standard streams such as [std::ofstream](https://en.cppreference.com/w/cpp/io/basic_ofstream). This example writes serialized `coordinate` object to the `coordinate.bin` file.
 
 ``` C++
 #include <fstream>
