@@ -5,7 +5,7 @@
 </p>
 
 # rbs
-`rbs` is raw binary serialization library. It doesn't append, prepend or insert any additional bytes. It just serializes/deserializes memory footprint of the types to/from `std::streambuf&` , `std::ios&` buffers which you provide by its constructors. If nothing is provided it instantiates a standalone `boost::asio::streambuf` buffer and uses it. It is also __endian-aware__ so it can provide portability across different platforms.
+`rbs` is raw binary serialization library. It doesn't append, prepend or insert any additional bytes. It just serializes/deserializes memory footprint of the types to/from `std::streambuf&` which you provide by its constructors. If nothing is provided it instantiates a standalone `boost::asio::streambuf` buffer and uses it. It is also __endian-aware__ so it can provide portability across different platforms.
 
 - Header only library
 - Usable with `find_package( rbs REQUIRED )` if it is installed to the system
