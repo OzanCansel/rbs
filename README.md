@@ -5,7 +5,7 @@
 </p>
 
 # rbs
-`rbs` is raw binary serialization library. It doesn't append, prepend or insert any additional bytes. It just serializes/deserializes raw memory to/from `std::streambuf&` , `std::ios&` buffers which you provide by its constructors. If nothing is provided it instantiates a standalone `boost::asio::streambuf` buffer and uses it.
+`rbs` is raw binary serialization library. It doesn't append, prepend or insert any additional bytes. It just serializes/deserializes memory footprint of the types to/from `std::streambuf&` which you provide by its constructors. If nothing is provided it instantiates a standalone `boost::asio::streambuf` buffer and uses it. It is also __endian-aware__ so it can provide portability across different platforms.
 
 - Header only library
 - Usable with `find_package( rbs REQUIRED )` if it is installed to the system
@@ -188,7 +188,7 @@ computer -> little | 0b 14 00 1e 00 00 00
 ```
 
 ### File Output Example
-`rbs` is able to work with standard streams such as [std::ofstream](https://en.cppreference.com/w/cpp/io/basic_ofstream). This examples writes serialized `coordinate` object to the `coordinate.bin` file.
+`rbs` is able to work with standard streams such as [std::ofstream](https://en.cppreference.com/w/cpp/io/basic_ofstream). This example writes serialized `coordinate` object to the `coordinate.bin` file.
 
 ``` C++
 #include <fstream>
@@ -270,3 +270,6 @@ add_executable( my_binary main.cpp )
 
 target_link_libraries( my_binary PRIVATE rbs::rbs )
 ```
+
+# LICENSE
+[MIT](https://raw.githubusercontent.com/OzanCansel/rbs/master/LICENSE)
