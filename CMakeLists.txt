@@ -71,5 +71,6 @@ export( EXPORT rbs-targets
 )
 
 add_subdirectory( example )
+add_subdirectory( benchmark )
 enable_testing()
 add_subdirectory( test )
