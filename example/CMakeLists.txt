@@ -37,3 +37,13 @@ target_link_libraries(
 
         rbs::rbs
 )
+
+add_executable( aggregate aggregate.cpp )
+
+target_link_libraries(
+    aggregate
+
+    PRIVATE
+
+        rbs::rbs
+)

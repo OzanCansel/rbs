@@ -123,6 +123,45 @@ int main()
 ```
 Output :
 ``` console
+little -> coordinate | 3f 80 00 00 40 00 00 00 40 40 00 00
+big    -> coordinate | 00 00 80 3f 00 00 00 40 00 00 40 40
+```
+
+### Aggregate Serialization
+`rbs` provides a convenient mechanism to serialize/deserialize an aggregate type automatically. Member of aggregate types will be serialized/deserialized in order they are declared.
+
+``` C++
+#include <iostream>
+#include <rbs/rbs.hpp>
+#include "helper.hpp"
+
+struct coordinate
+{
+    float x;
+    float y;
+    float z;
+};
+
+template<>
+struct rbs::aggregate_serializable<coordinate> : std::true_type
+{};
+
+int main()
+{
+    rbs::be_stream bes;
+    rbs::le_stream les;
+
+    coordinate coord { 1.0f , 2.0f , 3.0f };
+
+    bes << coord;
+    les << coord;
+
+    print( "little -> coordinate" , bes );
+    print( "big    -> coordinate" , les );
+}
+```
+Output :
+``` console
 little -> coordinate | 3f 80 00 00 40 00 00 00 40 40 00 00 
 big    -> coordinate | 00 00 80 3f 00 00 00 40 00 00 40 40
 ```
