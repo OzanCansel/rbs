@@ -2,6 +2,7 @@
 
 #include <boost/asio/streambuf.hpp>
 #include <ios>
+#include <cstdint>
 
 namespace rbs
 {
@@ -52,7 +53,13 @@ public:
     inline void write( const T& );
 
     template<typename T>
+    inline void write( const T* , std::size_t num_of_elems );
+
+    template<typename T>
     inline void read( T& );
+
+    template<typename T>
+    inline void read( T* , std::size_t num_of_elems );
 
 private:
 

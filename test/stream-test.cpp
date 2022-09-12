@@ -275,6 +275,85 @@ TEST_CASE( "write a native double" )
     REQUIRE( nth_byte( ss , 7 ) == mem.data[ 7 ] );
 }
 
+TEST_CASE( "write char array" )
+{
+    char data[ 4 ] { 0x01 , 0x02 , 0x03 ,0x04 };
+
+    rbs::nt_stream ss;
+
+    ss << data;
+
+    REQUIRE( size( ss ) == 4 );
+    REQUIRE( nth_byte( ss , 0 ) == data[ 0 ] );
+    REQUIRE( nth_byte( ss , 1 ) == data[ 1 ] );
+    REQUIRE( nth_byte( ss , 2 ) == data[ 2 ] );
+    REQUIRE( nth_byte( ss , 3 ) == data[ 3 ] );
+}
+
+TEST_CASE( "write be short array" )
+{
+    short data[ 4 ] { 0x0102 , 0x0304 , 0x0506 ,0x0708 };
+
+    rbs::be_stream ss;
+
+    ss << data;
+
+    REQUIRE( size( ss ) == 8 );
+    REQUIRE( nth_byte( ss , 0 ) == 0x01 );
+    REQUIRE( nth_byte( ss , 1 ) == 0x02 );
+    REQUIRE( nth_byte( ss , 2 ) == 0x03 );
+    REQUIRE( nth_byte( ss , 3 ) == 0x04 );
+    REQUIRE( nth_byte( ss , 4 ) == 0x05 );
+    REQUIRE( nth_byte( ss , 5 ) == 0x06 );
+    REQUIRE( nth_byte( ss , 6 ) == 0x07 );
+    REQUIRE( nth_byte( ss , 7 ) == 0x08 );
+}
+
+TEST_CASE( "write le short array" )
+{
+    short data[ 4 ] { 0x0102 , 0x0304 , 0x0506 ,0x0708 };
+
+    rbs::le_stream ss;
+
+    ss << data;
+
+    REQUIRE( size( ss ) == 8 );
+    REQUIRE( nth_byte( ss , 0 ) == 0x02 );
+    REQUIRE( nth_byte( ss , 1 ) == 0x01 );
+    REQUIRE( nth_byte( ss , 2 ) == 0x04 );
+    REQUIRE( nth_byte( ss , 3 ) == 0x03 );
+    REQUIRE( nth_byte( ss , 4 ) == 0x06 );
+    REQUIRE( nth_byte( ss , 5 ) == 0x05 );
+    REQUIRE( nth_byte( ss , 6 ) == 0x08 );
+    REQUIRE( nth_byte( ss , 7 ) == 0x07 );
+}
+
+TEST_CASE( "write nt short array" )
+{
+    union raw
+    {
+        short val;
+        char  data[ sizeof( short ) ];
+    };
+
+    short numbers[ 4 ] { 0x0102 , 0x0304 , 0x0506 , 0x0708 };
+    raw*  numbers_raw { reinterpret_cast<raw*>( numbers ) };
+
+    rbs::le_stream ss;
+
+    ss << numbers;
+
+    REQUIRE( size( ss ) == 8 );
+    REQUIRE( nth_byte( ss , 0 ) == numbers_raw[ 0 ].data[ 0 ] );
+    REQUIRE( nth_byte( ss , 1 ) == numbers_raw[ 0 ].data[ 1 ] );
+    REQUIRE( nth_byte( ss , 2 ) == numbers_raw[ 1 ].data[ 0 ] );
+    REQUIRE( nth_byte( ss , 3 ) == numbers_raw[ 1 ].data[ 1 ] );
+    REQUIRE( nth_byte( ss , 4 ) == numbers_raw[ 2 ].data[ 0 ] );
+    REQUIRE( nth_byte( ss , 5 ) == numbers_raw[ 2 ].data[ 1 ] );
+    REQUIRE( nth_byte( ss , 6 ) == numbers_raw[ 3 ].data[ 0 ] );
+    REQUIRE( nth_byte( ss , 7 ) == numbers_raw[ 3 ].data[ 1 ] );
+}
+
 TEST_CASE( "stream<E>::buffer as reference" )
 {
     boost::asio::streambuf buffer;
@@ -586,4 +665,67 @@ TEST_CASE( "Read nt double" )
     ss >> value;
 
     REQUIRE( value == memory.val );
+}
+
+TEST_CASE( "Read char array" )
+{
+    boost::asio::streambuf buffer;
+
+    buffer.sputc( 0x01 );
+    buffer.sputc( 0x02 );
+    buffer.sputc( 0x03 );
+
+    rbs::le_stream ss { buffer };
+
+    char val[ 3 ];
+
+    ss >> val;
+
+    REQUIRE( val[ 0 ] == 0x01 );
+    REQUIRE( val[ 1 ] == 0x02 );
+    REQUIRE( val[ 2 ] == 0x03 );
+}
+
+TEST_CASE( "Read be short array" )
+{
+    boost::asio::streambuf buffer;
+
+    buffer.sputc( 0x01 );
+    buffer.sputc( 0x02 );
+    buffer.sputc( 0x03 );
+    buffer.sputc( 0x04 );
+    buffer.sputc( 0x05 );
+    buffer.sputc( 0x06 );
+
+    rbs::be_stream ss { buffer };
+
+    std::uint16_t val[ 3 ];
+
+    ss >> val;
+
+    REQUIRE( val[ 0 ] == 0x0102 );
+    REQUIRE( val[ 1 ] == 0x0304 );
+    REQUIRE( val[ 2 ] == 0x0506 );
+}
+
+TEST_CASE( "Read le short array" )
+{
+    boost::asio::streambuf buffer;
+
+    buffer.sputc( 0x02 );
+    buffer.sputc( 0x01 );
+    buffer.sputc( 0x04 );
+    buffer.sputc( 0x03 );
+    buffer.sputc( 0x06 );
+    buffer.sputc( 0x05 );
+
+    rbs::le_stream ss { buffer };
+
+    short val[ 3 ];
+
+    ss >> val;
+
+    REQUIRE( val[ 0 ] == 0x0102 );
+    REQUIRE( val[ 1 ] == 0x0304 );
+    REQUIRE( val[ 2 ] == 0x0506 );
 }

@@ -6,12 +6,23 @@
 
 TEST_CASE( "stream-write" )
 {
+    std::vector<short> floats( 1e6 );
+    std::vector<short> shorts( 1e6 );
+    std::vector<char>  chars( 1e6 );
+
     BENCHMARK( "Serialize 1'000'000 float native" )
     {
         rbs::nt_stream ss;
 
         for ( auto i = 0; i < 1e6; ++i )
             ss << float( i );
+    };
+
+    BENCHMARK( "Serialize 1'000'000 floats native as bulk" )
+    {
+        rbs::nt_stream ss;
+
+        ss.write( data( floats ) , size( floats ) );
     };
 
     BENCHMARK( "Serialize 1'000'000 short native" )
@@ -22,12 +33,26 @@ TEST_CASE( "stream-write" )
             ss << short( i );
     };
 
+    BENCHMARK( "Serialize 1'000'000 shorts native as bulk" )
+    {
+        rbs::nt_stream ss;
+
+        ss.write( data( shorts ) , size( shorts ) );
+    };
+
     BENCHMARK( "Serialize 1'000'000 char native" )
     {
         rbs::nt_stream ss;
 
         for ( auto i = 0; i < 1e6; ++i )
             ss << char( i );
+    };
+
+    BENCHMARK( "Serialize 1'000'000 chars native as bulk" )
+    {
+        rbs::nt_stream ss;
+
+        ss.write( data( chars ) , size( chars ) );
     };
 
     BENCHMARK( "Serialize 1'000'000 float opposite endianness" )
@@ -48,6 +73,22 @@ TEST_CASE( "stream-write" )
         }
     };
 
+    BENCHMARK( "Serialize 1'000'000 float opposite endianness as bulk" )
+    {
+        if constexpr ( rbs::endian::big == rbs::endian::native )
+        {
+            rbs::le_stream ss;
+
+            ss.write( data( floats ) , size( floats ) );
+        }
+        else
+        {
+            rbs::be_stream ss;
+
+            ss.write( data( floats ) , size( floats ) );
+        }
+    };
+
     BENCHMARK( "Serialize 1'000'000 short opposite endianness" )
     {
         if constexpr ( rbs::endian::big == rbs::endian::native )
@@ -63,6 +104,22 @@ TEST_CASE( "stream-write" )
 
             for ( auto i = 0; i < 1e6; ++i )
                 ss << short( i );
+        }
+    };
+
+    BENCHMARK( "Serialize 1'000'000 short opposite endianness as bulk" )
+    {
+        if constexpr ( rbs::endian::big == rbs::endian::native )
+        {
+            rbs::le_stream ss;
+
+            ss.write( data( shorts ) , size( shorts ) );
+        }
+        else
+        {
+            rbs::be_stream ss;
+
+            ss.write( data( shorts ) , size( shorts ) );
         }
     };
 }
