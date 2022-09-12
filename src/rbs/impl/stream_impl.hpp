@@ -182,9 +182,6 @@ operator<<( stream<E , OwnsBuffer>& ss , const T& value )
     return ss;
 }
 
-template<typename T>
-void print();
-
 template<endian E , bool OwnsBuffer , typename T , std::size_t N>
 inline
 std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
