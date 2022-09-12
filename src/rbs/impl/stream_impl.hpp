@@ -192,6 +192,17 @@ operator<<( stream<E , OwnsBuffer>& ss , const T(&src)[N] )
     return ss;
 }
 
+template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+inline
+std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
+operator<<( stream<E , OwnsBuffer>& ss , const T(&src)[N] )
+{
+    for ( std::size_t i = 0; i < N; ++i )
+        ss << src[ i ];
+
+    return ss;
+}
+
 template<endian E , bool OwnsBuffer , typename T>
 inline
 std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
@@ -208,6 +219,17 @@ std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
 operator>>( stream<E , OwnsBuffer>& ss , T(&src)[ N ] )
 {
     ss.template read<T>( src , N );
+
+    return ss;
+}
+
+template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+inline
+std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
+operator>>( stream<E , OwnsBuffer>& ss , T(&src)[ N ] )
+{
+    for ( std::size_t i = 0; i < N; ++i )
+        ss >> src[ i ];
 
     return ss;
 }

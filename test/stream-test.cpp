@@ -4,6 +4,24 @@
 #include <rbs/stream.hpp>
 #include "helper.hpp"
 
+struct foo
+{
+    short val_1;
+    char  val_2;
+
+    template<auto... Args>
+    friend rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const foo& f )
+    {
+        return ss << f.val_1 << f.val_2;
+    }
+
+    template<auto... Args>
+    friend rbs::stream<Args...>& operator>>( rbs::stream<Args...>& ss , foo& f )
+    {
+        return ss >> f.val_1 >> f.val_2;
+    }
+};
+
 TEST_CASE( "write a char" )
 {
     rbs::be_stream ss;
@@ -352,6 +370,36 @@ TEST_CASE( "write nt short array" )
     REQUIRE( nth_byte( ss , 5 ) == numbers_raw[ 2 ].data[ 1 ] );
     REQUIRE( nth_byte( ss , 6 ) == numbers_raw[ 3 ].data[ 0 ] );
     REQUIRE( nth_byte( ss , 7 ) == numbers_raw[ 3 ].data[ 1 ] );
+}
+
+TEST_CASE( "write be custom type array" )
+{
+    foo foos[ 4 ]
+    {
+        { 0x01 , 0x02 } ,
+        { 0x03 , 0x04 } ,
+        { 0x05 , 0x06 } ,
+        { 0x07 , 0x08 }
+    };
+
+
+    rbs::be_stream ss;
+
+    ss << foos;
+
+    REQUIRE( size( ss ) == 12 );
+    REQUIRE( nth_byte( ss , 0  ) == 0x00 );
+    REQUIRE( nth_byte( ss , 1  ) == 0x01 );
+    REQUIRE( nth_byte( ss , 2  ) == 0x02 );
+    REQUIRE( nth_byte( ss , 3  ) == 0x00 );
+    REQUIRE( nth_byte( ss , 4  ) == 0x03 );
+    REQUIRE( nth_byte( ss , 5  ) == 0x04 );
+    REQUIRE( nth_byte( ss , 6  ) == 0x00 );
+    REQUIRE( nth_byte( ss , 7  ) == 0x05 );
+    REQUIRE( nth_byte( ss , 8  ) == 0x06 );
+    REQUIRE( nth_byte( ss , 9  ) == 0x00 );
+    REQUIRE( nth_byte( ss , 10 ) == 0x07 );
+    REQUIRE( nth_byte( ss , 11 ) == 0x08 );
 }
 
 TEST_CASE( "stream<E>::buffer as reference" )
@@ -728,4 +776,36 @@ TEST_CASE( "Read le short array" )
     REQUIRE( val[ 0 ] == 0x0102 );
     REQUIRE( val[ 1 ] == 0x0304 );
     REQUIRE( val[ 2 ] == 0x0506 );
+}
+
+TEST_CASE( "read be custom type array" )
+{
+    boost::asio::streambuf buffer;
+
+    buffer.sputc( 0x00 );
+    buffer.sputc( 0x01 );
+    buffer.sputc( 0x02 );
+    buffer.sputc( 0x00 );
+    buffer.sputc( 0x03 );
+    buffer.sputc( 0x04 );
+    buffer.sputc( 0x00 );
+    buffer.sputc( 0x05 );
+    buffer.sputc( 0x06 );
+    buffer.sputc( 0x00 );
+    buffer.sputc( 0x07 );
+    buffer.sputc( 0x08 );
+
+    rbs::be_stream ss { buffer };
+
+    foo foos[ 4 ];
+    ss >> foos;
+
+    REQUIRE( foos[ 0 ].val_1 == 0x01 );
+    REQUIRE( foos[ 0 ].val_2 == 0x02 );
+    REQUIRE( foos[ 1 ].val_1 == 0x03 );
+    REQUIRE( foos[ 1 ].val_2 == 0x04 );
+    REQUIRE( foos[ 2 ].val_1 == 0x05 );
+    REQUIRE( foos[ 2 ].val_2 == 0x06 );
+    REQUIRE( foos[ 3 ].val_1 == 0x07 );
+    REQUIRE( foos[ 3 ].val_2 == 0x08 );
 }

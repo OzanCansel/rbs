@@ -256,7 +256,7 @@ Output :
 00000000  00 00 00 01 00 00 00 02  00 00 00 03              |............|
 ```
 
-### Array Serialization
+### Primitive Array Serialization
 `rbs` provides built-in mechanism to serialize/deserialize an array which holds primitive types.
 
 ``` C++
@@ -282,6 +282,50 @@ Output :
 ``` console
 little -> numbers | 01 02 03 04 05 06 07 08 
 big    -> numbers | 02 01 04 03 06 05 08 07
+```
+
+### User Defined Type Array Serialization
+`rbs` provides built-in mechanism to serialize/deserialize an array which holds user defined types.
+
+``` C++
+#include <iostream>
+#include <rbs/rbs.hpp>
+#include "helper.hpp"
+
+struct foo
+{
+    short x;
+    short y;
+};
+
+template<>
+struct rbs::aggregate_serializable<foo> : std::true_type
+{};
+
+int main()
+{
+    rbs::be_stream bes;
+    rbs::le_stream les;
+
+    foo foos[]
+    {
+        { 0x01 , 0x02 } ,
+        { 0x03 , 0x04 } ,
+        { 0x05 , 0x06 } ,
+        { 0x07 , 0x08 }
+    };
+
+    bes << foos;
+    les << foos;
+
+    print( "little -> foos" , bes );
+    print( "big    -> foos" , les );
+}
+```
+Output :
+``` console
+little -> foos | 00 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08
+big    -> foos | 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00
 ```
 
 ## How to use ?

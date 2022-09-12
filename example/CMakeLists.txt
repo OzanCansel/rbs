@@ -48,10 +48,20 @@ target_link_libraries(
         rbs::rbs
 )
 
-add_executable( array array.cpp )
+add_executable( array-primitive array-primitive.cpp )
 
 target_link_libraries(
-    array
+    array-primitive
+
+    PRIVATE
+
+        rbs::rbs
+)
+
+add_executable( array-struct array-struct.cpp )
+
+target_link_libraries(
+    array-struct
 
     PRIVATE
 
