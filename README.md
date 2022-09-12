@@ -256,6 +256,34 @@ Output :
 00000000  00 00 00 01 00 00 00 02  00 00 00 03              |............|
 ```
 
+### Array Serialization
+`rbs` provides built-in mechanism to serialize/deserialize an array which holds primitive types.
+
+``` C++
+#include <iostream>
+#include <rbs/rbs.hpp>
+#include "helper.hpp"
+
+int main()
+{
+    rbs::be_stream bes;
+    rbs::le_stream les;
+
+    short numbers[] { 0x0102 , 0x0304 , 0x0506 , 0x0708 };
+
+    bes << numbers;
+    les << numbers;
+
+    print( "little -> numbers" , bes );
+    print( "big    -> numbers" , les );
+}
+```
+Output :
+``` console
+little -> numbers | 01 02 03 04 05 06 07 08 
+big    -> numbers | 02 01 04 03 06 05 08 07
+```
+
 ## How to use ?
 ### Option 1. Install to the system
 - Install `rbs` as system-wide.
