@@ -47,3 +47,13 @@ target_link_libraries(
 
         rbs::rbs
 )
+
+add_executable( array array.cpp )
+
+target_link_libraries(
+    array
+
+    PRIVATE
+
+        rbs::rbs
+)
