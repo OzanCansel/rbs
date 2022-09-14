@@ -10,6 +10,11 @@ inline std::uint8_t nth_byte( rbs::stream<E , OwnsBuffer>& bs , int idx )
     return std::uint8_t( buffers_begin( bs.buf().data() )[ idx ] );
 }
 
+inline std::uint8_t nth_byte( boost::asio::streambuf& bs , int idx )
+{
+    return std::uint8_t( buffers_begin( bs.data() )[ idx ] );
+}
+
 template<rbs::endian E , bool OwnsBuffer>
 inline int size( rbs::stream<E , OwnsBuffer>& bs )
 {

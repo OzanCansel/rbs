@@ -67,3 +67,13 @@ target_link_libraries(
 
         rbs::rbs
 )
+
+add_executable( serialize-util serialize-util.cpp )
+
+target_link_libraries(
+    serialize-util
+
+    PRIVATE
+
+        rbs::rbs
+)

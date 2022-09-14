@@ -328,6 +328,30 @@ little -> foos | 00 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08
 big    -> foos | 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00
 ```
 
+### Serialize Util Function
+`rbs` provides `serialize_be`, `serialize_le`, `serialize_nt` functions for less verbose code snippets.
+
+``` C++
+#include <iostream>
+#include <rbs/serialize_util.hpp>
+#include "helper.hpp"
+
+int main()
+{
+    boost::asio::streambuf buffer;
+
+    rbs::serialize_be( 0x01020304 , buffer );
+    rbs::serialize_le( 0x01020304 , buffer );
+    rbs::serialize_nt( 0x01020304 , buffer );
+
+    print( "beint|leint|ntint" , buffer );
+}
+```
+Output :
+``` console
+beint|leint|ntint | 01 02 03 04 04 03 02 01 04 03 02 01
+```
+
 ## How to use ?
 ### Option 1. Install to the system
 - Install `rbs` as system-wide.
