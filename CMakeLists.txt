@@ -4,6 +4,21 @@ project( rbs )
 add_library( rbs INTERFACE )
 add_library( rbs::rbs ALIAS rbs )
 
+find_package( Boost REQUIRED )
+
+set( BOOST_PFR_EXISTS NO )
+
+if( "${Boost_VERSION}" VERSION_GREATER_EQUAL "1.75.0" )
+    set( Boost_PFR_EXISTS YES )
+else()
+    message( "Boost PFR module doesn't exist so aggregate serialization will be disabled." )
+endif()
+
+message( "==================================" )
+message( "Boost version : ${Boost_VERSION}" )
+message( "Pfr existence : ${BOOST_PFR_EXISTS}" )
+message( "==================================" )
+
 target_include_directories(
     rbs
 

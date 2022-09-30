@@ -38,15 +38,19 @@ target_link_libraries(
         rbs::rbs
 )
 
-add_executable( aggregate aggregate.cpp )
+if( ${BOOST_PFR_EXISTS} )
 
-target_link_libraries(
-    aggregate
+    add_executable( aggregate aggregate.cpp )
 
-    PRIVATE
+    target_link_libraries(
+        aggregate
 
-        rbs::rbs
-)
+        PRIVATE
+
+            rbs::rbs
+    )
+
+endif()
 
 add_executable( array-primitive array-primitive.cpp )
 

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 107500
+
 #include <type_traits>
 #include <boost/pfr.hpp>
 #include "rbs/stream.hpp"
@@ -82,3 +86,5 @@ operator>>( stream<Args...>& ss , T& aggr )
 }
 
 }
+
+#endif

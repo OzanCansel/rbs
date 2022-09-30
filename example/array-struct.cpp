@@ -8,9 +8,11 @@ struct foo
     short y;
 };
 
-template<>
-struct rbs::aggregate_serializable<foo> : std::true_type
-{};
+template<auto... Args>
+inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const foo& x )
+{
+    return ss << x.x << x.y;
+}
 
 int main()
 {
