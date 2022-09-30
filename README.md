@@ -4,7 +4,7 @@
 - Header only library
 - Usable with `find_package( rbs REQUIRED )` if it is installed to the system
 - Needs C++17 or higher
-- Only `Boost.Asio` dependency
+- Only `Boost.Asio` and `Boost.Pfr` dependency
 
 ## Examples
 All examples use `helper.hpp` to print bytes. Here its content is :
