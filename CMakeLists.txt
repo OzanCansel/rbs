@@ -28,6 +28,14 @@ target_include_directories(
         $<INSTALL_INTERFACE:src>
 )
 
+target_link_libraries(
+    rbs
+
+    INTERFACE
+
+        Boost::boost
+)
+
 target_compile_features(
     rbs
 

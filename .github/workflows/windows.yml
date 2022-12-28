@@ -1,0 +1,77 @@
+name: windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  builder:
+    strategy:
+      fail-fast: false
+      matrix:
+        vc_boost:
+          - name: vc142_boost_1750
+            image: 'windows-2019'
+            url: 'https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz'
+            archive_name: 'boost_1_75_0.tar.gz'
+            folder_name: 'boost_1_75_0'
+            include_folder: 'C:\Boost\include\boost-1_75'
+          - name: vc143_boost_1800
+            image: 'windows-2022'
+            url: 'https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/boost_1_80_0.tar.gz'
+            archive_name: 'boost_1_80_0.tar.gz'
+            folder_name: 'boost_1_80_0'
+            include_folder: 'C:\Boost\include\boost-1_80'
+        build_type:
+          - Debug
+          - Release
+        platform:
+          - name: win32
+            bits: 32
+          - name: x64
+            bits: 64
+
+    runs-on: ${{ matrix.vc_boost.image }}
+    name: >-
+      ${{ matrix.vc_boost.name }}, ${{ matrix.build_type }}, ${{ matrix.platform.name }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Boost
+        run: |
+          Invoke-WebRequest `
+              "${{ matrix.vc_boost.url }}" `
+              -OutFile "${{ matrix.vc_boost.archive_name }}" `
+              -UserAgent "''"
+          tar xzf ${{ matrix.vc_boost.archive_name }}
+          rm ${{ matrix.vc_boost.archive_name }}
+          cd ${{ matrix.vc_boost.folder_name }}
+          .\bootstrap.bat
+          .\b2 address-model=${{ matrix.arch.bits }} --with-atomic --with-thread --with-chrono install
+          cd ..
+          Remove-Item ${{ matrix.vc_boost.folder_name }} -Recurse -Force
+
+      - name: Build & Install
+        env:
+          BUILD_DIR: build
+          BUILD_CONFIGURATION: ${{ matrix.build_type }}
+          PLATFORM: ${{ matrix.platform.name }}
+        run: |
+          mkdir $env:BUILD_DIR
+          echo Configure
+          cmake -S . `
+                -B $env:BUILD_DIR `
+                -A $env:PLATFORM `
+                -DCMAKE_BUILD_TYPE=$env:BUILD_CONFIGURATION `
+                -DCMAKE_PREFIX_PATH="C:\Boost"
+
+          cmake --build $env:BUILD_DIR --parallel --config $env:BUILD_CONFIGURATION
+
+      - name: Test
+        env:
+          BUILD_DIR: build
+        run: |
+          cd $env:BUILD_DIR
+          ctest -C ${{ matrix.build_type }} .
