@@ -1,0 +1,67 @@
+name: windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  nightly-Windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        vc_boost:
+          - name: msvc-2022_boost_1750
+            image: 'windows-2022'
+            boost_url: 'https://boostorg.jfrog.io/artifactory/main/release/1.75.0/source/boost_1_75_0.tar.gz'
+            boost_archive_name: 'boost_1_75_0.tar.gz'
+            boost_folder_name: 'boost_1_75_0'
+            boost_include_folder: 'C:\Boost\include\boost-1_75'
+        build_type:
+          - Debug
+          - Release
+
+    runs-on: ${{ matrix.vc_boost.image }}
+    name: >-
+      Windows
+      (${{ matrix.vc_boost.name }}, ${{ matrix.build_type }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Boost
+        run: |
+          Invoke-WebRequest `
+              "${{ matrix.vc_boost.boost_url }}" `
+              -OutFile "${{ matrix.vc_boost.boost_archive_name }}" `
+              -UserAgent "''"
+          tar xzf ${{ matrix.vc_boost.boost_archive_name }}
+          rm ${{ matrix.vc_boost.boost_archive_name }}
+          cd ${{ matrix.vc_boost.boost_folder_name }}
+          .\bootstrap.bat
+          .\b2 address-model=${{ matrix.arch.address_model }} --with-atomic --with-thread --with-chrono install
+          cd ..
+          Remove-Item ${{ matrix.vc_boost.boost_folder_name }} -Recurse -Force
+
+      - name: Build & Install
+        env:
+          BUILD_DIR: build
+          BUILD_CONFIGURATION: ${{ matrix.build_type }}
+        run: |
+          @rd /s /q %BUILD_DIR%
+          @mkdir %BUILD_DIR%
+
+          @echo Configure
+          cmake -S . -B %BUILD_DIR% `
+                -A %PLATFORM% `
+                -DCMAKE_CONFIGURATION_TYPES=%BUILD_CONFIGURATION% `
+                %* `
+                || exit /b 1
+          
+          @echo Build
+          cmake --build %BUILD_DIR% --parallel --config %BUILD_CONFIGURATION% || exit /b 1
+
+      - name: Test
+        env:
+          BUILD_DIR: build
+        run: |
+          cd %BUILD_DIR%
+          ctest
+          
