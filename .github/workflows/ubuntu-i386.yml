@@ -1,0 +1,57 @@
+name: ubuntu-i386
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        boost:
+          - version: 1.75.0
+          - version: 1.80.0
+
+        build:
+          - type: Debug
+          - type: Release
+
+    runs-on: ubuntu-latest
+    container:
+      image: i386/ubuntu
+      options: --privileged
+
+    name: >-
+      gcc_${{ matrix.build.type }}_${{matrix.boost.version}}
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Dependencies
+        run: |
+          apt update
+          apt install -y curl build-essential cmake
+
+      - name: Install Boost
+        run: |
+          TARBALL_NAME=boost_$(echo "${{matrix.boost.version}}" | tr . _)
+
+          echo "TARBAL_NAME=" ${TARBALL_NAME}
+
+          curl --silent -Lo $TARBALL_NAME.tar.gz https://boostorg.jfrog.io/artifactory/main/release/${{matrix.boost.version}}/source/$TARBALL_NAME.tar.gz
+          tar xzf $TARBALL_NAME.tar.gz
+          cd $TARBALL_NAME
+          ./bootstrap.sh
+          ./b2 --with-thread --with-chrono install
+      - name: Build & Install
+        run: |
+          mkdir build && cd build
+
+          cmake .. -DCMAKE_BUILD_TYPE=${{ matrix.build.type }}
+          cmake --build . -- -j
+      - name: Test
+        run: |
+          cd build
+          ctest .
