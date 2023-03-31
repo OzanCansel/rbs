@@ -42,7 +42,7 @@ int main()
         byte_order::little
     };
 
-    rbs::le_stream les;
+    rbs::stream les { rbs::endian::little };
 
     les << my_pc;
 

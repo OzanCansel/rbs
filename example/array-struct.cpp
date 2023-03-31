@@ -16,8 +16,8 @@ inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const foo& x
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big    };
+    rbs::stream les { rbs::endian::little };
 
     foo foos[]
     {

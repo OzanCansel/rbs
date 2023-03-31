@@ -17,8 +17,7 @@ All examples use `helper.hpp` to print bytes. Here its content is :
 #include <boost/asio/buffers_iterator.hpp>
 #include <rbs/stream.hpp>
 
-template<rbs::endian E>
-inline void print( std::string_view prefix , rbs::stream<E , true>& ss )
+inline void print( std::string_view prefix , rbs::stream<true>& ss )
 {
     std::cout << prefix << " | ";
 
@@ -44,7 +43,7 @@ inline void print( std::string_view prefix , rbs::stream<E , true>& ss )
 
 int main()
 {
-    rbs::be_stream bes;
+    rbs::stream bes { rbs::endian::big };
 
     bes << char( 0x1F )
         << short( 0x0102 )
@@ -52,7 +51,7 @@ int main()
         << float( 1234.56789f )
         << double( 123456789.123456789 );
 
-    rbs::le_stream les;
+    rbs::stream les { rbs::endian::little };
 
     les << char( 0x1F )
         << short( 0x0102 )
@@ -60,7 +59,7 @@ int main()
         << float( 1234.56789f )
         << double( 123456789.123456789 );
 
-    rbs::nt_stream nts;
+    rbs::stream nts { rbs::endian::native };
 
     nts << char( 0x1F )
         << short( 0x0102 )
@@ -103,8 +102,8 @@ inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const coordi
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big    };
+    rbs::stream les { rbs::endian::little };
 
     coordinate coord { 1.0f , 2.0f , 3.0f };
 
@@ -142,8 +141,8 @@ struct rbs::aggregate_serializable<coordinate> : std::true_type
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big    };
+    rbs::stream les { rbs::endian::little };
 
     coordinate coord { 1.0f , 2.0f , 3.0f };
 
@@ -208,7 +207,7 @@ int main()
         byte_order::little
     };
 
-    rbs::le_stream les;
+    rbs::stream les { rbs::endian::little };
 
     les << my_pc;
 
@@ -243,7 +242,7 @@ rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const coordinate& c
 int main()
 {
     std::ofstream  of  { "coordinate.bin" };
-    rbs::be_stream out { of };
+    rbs::stream out { of , rbs::endian::big };
 
     coordinate c { 1 , 2 , 3 };
 
@@ -266,8 +265,8 @@ Output :
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big    };
+    rbs::stream les { rbs::endian::little };
 
     short numbers[] { 0x0102 , 0x0304 , 0x0506 , 0x0708 };
 
@@ -304,8 +303,8 @@ struct rbs::aggregate_serializable<foo> : std::true_type
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big    };
+    rbs::stream les { rbs::endian::little };
 
     foo foos[]
     {

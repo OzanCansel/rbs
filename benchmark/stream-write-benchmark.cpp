@@ -12,7 +12,7 @@ TEST_CASE( "stream-write" )
 
     BENCHMARK( "Serialize 1'000'000 float native" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         for ( auto i = 0; i < 1e6; ++i )
             ss << float( i );
@@ -20,14 +20,14 @@ TEST_CASE( "stream-write" )
 
     BENCHMARK( "Serialize 1'000'000 floats native as bulk" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         ss.write( data( floats ) , size( floats ) );
     };
 
     BENCHMARK( "Serialize 1'000'000 short native" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         for ( auto i = 0; i < 1e6; ++i )
             ss << short( i );
@@ -35,14 +35,14 @@ TEST_CASE( "stream-write" )
 
     BENCHMARK( "Serialize 1'000'000 shorts native as bulk" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         ss.write( data( shorts ) , size( shorts ) );
     };
 
     BENCHMARK( "Serialize 1'000'000 char native" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         for ( auto i = 0; i < 1e6; ++i )
             ss << char( i );
@@ -50,7 +50,7 @@ TEST_CASE( "stream-write" )
 
     BENCHMARK( "Serialize 1'000'000 chars native as bulk" )
     {
-        rbs::nt_stream ss;
+        rbs::stream ss { rbs::endian::native };
 
         ss.write( data( chars ) , size( chars ) );
     };
@@ -59,14 +59,14 @@ TEST_CASE( "stream-write" )
     {
         if constexpr ( rbs::endian::big == rbs::endian::native )
         {
-            rbs::le_stream ss;
+            rbs::stream ss { rbs::endian::little };
 
             for ( auto i = 0; i < 1e6; ++i )
                 ss << float( i );
         }
         else
         {
-            rbs::be_stream ss;
+            rbs::stream ss { rbs::endian::big };
 
             for ( auto i = 0; i < 1e6; ++i )
                 ss << float( i );
@@ -77,13 +77,13 @@ TEST_CASE( "stream-write" )
     {
         if constexpr ( rbs::endian::big == rbs::endian::native )
         {
-            rbs::le_stream ss;
+            rbs::stream ss { rbs::endian::little };
 
             ss.write( data( floats ) , size( floats ) );
         }
         else
         {
-            rbs::be_stream ss;
+            rbs::stream ss { rbs::endian::big };
 
             ss.write( data( floats ) , size( floats ) );
         }
@@ -93,14 +93,14 @@ TEST_CASE( "stream-write" )
     {
         if constexpr ( rbs::endian::big == rbs::endian::native )
         {
-            rbs::le_stream ss;
+            rbs::stream ss { rbs::endian::little };
 
             for ( auto i = 0; i < 1e6; ++i )
                 ss << short( i );
         }
         else
         {
-            rbs::be_stream ss;
+            rbs::stream ss { rbs::endian::big };
 
             for ( auto i = 0; i < 1e6; ++i )
                 ss << short( i );
@@ -111,13 +111,13 @@ TEST_CASE( "stream-write" )
     {
         if constexpr ( rbs::endian::big == rbs::endian::native )
         {
-            rbs::le_stream ss;
+            rbs::stream ss { rbs::endian::little };
 
             ss.write( data( shorts ) , size( shorts ) );
         }
         else
         {
-            rbs::be_stream ss;
+            rbs::stream ss { rbs::endian::big };
 
             ss.write( data( shorts ) , size( shorts ) );
         }

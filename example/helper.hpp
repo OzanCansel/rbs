@@ -22,8 +22,8 @@ inline void print( std::string_view prefix , boost::asio::streambuf& buffer )
     std::cout << std::endl;
 }
 
-template<rbs::endian E>
-inline void print( std::string_view prefix , rbs::stream<E , true>& ss )
+template<bool OwnsBuffer>
+inline void print( std::string_view prefix , rbs::stream<OwnsBuffer>& ss )
 {
     print( prefix , ss.buf() );
 }

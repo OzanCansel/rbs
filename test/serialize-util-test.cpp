@@ -6,7 +6,7 @@
 
 TEST_CASE( "serialize_be with std::streambuf&" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << 0x01020304;
 
@@ -20,7 +20,7 @@ TEST_CASE( "serialize_be with std::streambuf&" )
 
 TEST_CASE( "serialize_le with std::streambuf&" )
 {
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << 0x01020304;
 
@@ -34,7 +34,7 @@ TEST_CASE( "serialize_le with std::streambuf&" )
 
 TEST_CASE( "serialize_nt with std::streambuf&" )
 {
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << 0x01020304;
 
@@ -48,7 +48,7 @@ TEST_CASE( "serialize_nt with std::streambuf&" )
 
 TEST_CASE( "serialize_be with std::ios&" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << 0x01020304;
 
@@ -64,7 +64,7 @@ TEST_CASE( "serialize_be with std::ios&" )
 
 TEST_CASE( "serialize_le with std::ios&" )
 {
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << 0x01020304;
 
@@ -80,7 +80,7 @@ TEST_CASE( "serialize_le with std::ios&" )
 
 TEST_CASE( "serialize_nt with std::ios&" )
 {
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << 0x01020304;
 

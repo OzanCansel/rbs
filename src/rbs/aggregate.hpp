@@ -15,7 +15,7 @@ namespace impl
 {
 
 template<typename T , std::size_t... Idx , auto... Args>
-inline void aggregate_serialize(
+void aggregate_serialize(
     stream<Args...>& ss ,
     const T& value ,
     std::index_sequence<Idx...>
@@ -25,7 +25,7 @@ inline void aggregate_serialize(
 }
 
 template<typename T , std::size_t... Idx , auto... Args>
-inline void aggregate_deserialize(
+void aggregate_deserialize(
     stream<Args...>& ss ,
     T& value ,
     std::index_sequence<Idx...>
@@ -44,7 +44,6 @@ template<typename T>
 static constexpr bool aggregate_serializable_v = aggregate_serializable<T>::value;
 
 template<typename T , auto... Args>
-inline
 std::enable_if_t<aggregate_serializable_v<T> , stream<Args...>&>
 operator<<( stream<Args...>& ss , const T& aggr )
 {
@@ -65,7 +64,6 @@ operator<<( stream<Args...>& ss , const T& aggr )
 }
 
 template<typename T , auto... Args>
-inline
 std::enable_if_t<aggregate_serializable_v<T> , stream<Args...>&>
 operator>>( stream<Args...>& ss , T& aggr )
 {

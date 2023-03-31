@@ -40,61 +40,39 @@ enum class endian
 #endif
 };
 
-template<endian E , bool OwnBuffer>
+template<bool OwnBuffer>
 class stream : public impl::conditional_buffer<OwnBuffer>
 {
 public:
 
-    inline stream();
-    inline stream( std::streambuf& );
-    inline stream( std::ios& );
+    stream( endian = endian::big );
+    stream( std::streambuf& , endian = endian::big );
+    stream( std::ios& , endian = endian::big );
 
     template<typename T>
-    inline void write( const T& );
+    void write( const T& );
 
     template<typename T>
-    inline void write( const T* , std::size_t num_of_elems );
+    void write( const T* , std::size_t num_of_elems );
 
     template<typename T>
-    inline void read( T& );
+    void read( T& );
 
     template<typename T>
-    inline void read( T* , std::size_t num_of_elems );
+    void read( T* , std::size_t num_of_elems );
+
+    endian byte_order() const;
+    void byte_order( endian );
 
 private:
 
+    endian m_endian;
     std::streambuf& m_buffer;
 };
 
-template<bool OwnBuffer>
-struct be_stream : stream<endian::big , OwnBuffer>
-{
-    using stream<endian::big , OwnBuffer>::stream;
-};
-
-be_stream()                  -> be_stream<true>;
-be_stream( std::streambuf& ) -> be_stream<false>;
-be_stream( std::ios& )       -> be_stream<false>;
-
-template<bool OwnBuffer>
-struct le_stream : stream<endian::little , OwnBuffer>
-{
-    using stream<endian::little , OwnBuffer>::stream;
-};
-
-le_stream()                  -> le_stream<true>;
-le_stream( std::streambuf& ) -> le_stream<false>;
-le_stream( std::ios& )       -> le_stream<false>;
-
-template<bool OwnBuffer>
-struct nt_stream : stream<endian::native , OwnBuffer>
-{
-    using stream<endian::native , OwnBuffer>::stream;
-};
-
-nt_stream()                  -> nt_stream<true>;
-nt_stream( std::streambuf& ) -> nt_stream<false>;
-nt_stream( std::ios& )       -> nt_stream<false>;
+stream( endian )                   -> stream<true>;
+stream( std::streambuf& , endian ) -> stream<false>;
+stream( std::ios& , endian )       -> stream<false>;
 
 }
 

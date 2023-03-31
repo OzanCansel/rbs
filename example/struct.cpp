@@ -17,8 +17,8 @@ inline rbs::stream<Args...>& operator<<( rbs::stream<Args...>& ss , const coordi
 
 int main()
 {
-    rbs::be_stream bes;
-    rbs::le_stream les;
+    rbs::stream bes { rbs::endian::big };
+    rbs::stream les { rbs::endian::little };
 
     coordinate coord { 1.0f , 2.0f , 3.0f };
 

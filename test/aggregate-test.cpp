@@ -17,7 +17,7 @@ struct rbs::aggregate_serializable<coordinate> : std::true_type
 
 TEST_CASE( "Aggregate operator<< | three fields aggregate type" )
 {
-    rbs::be_stream bes;
+    rbs::stream bes { rbs::endian::big };
 
     coordinate c { 1 , 2 , 3 };
 
@@ -46,7 +46,7 @@ TEST_CASE( "Aggregate operator>> | three fields aggregate type" )
     buffer.sputc( 0x00 );
     buffer.sputc( 0x03 );
 
-    rbs::be_stream bes { buffer };
+    rbs::stream bes { buffer , rbs::endian::big };
 
     coordinate c;
 

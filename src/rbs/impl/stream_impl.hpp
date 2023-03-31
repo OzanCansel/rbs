@@ -19,35 +19,37 @@ namespace impl
     constexpr auto suitable_to_rw_v = suitable_to_rw<T>::value;
 }
 
-template<endian E , bool OwnsBuffer>
-stream<E , OwnsBuffer>::stream()
-    :   m_buffer { impl::conditional_buffer<OwnsBuffer>::buf() }
+template<bool OwnsBuffer>
+stream<OwnsBuffer>::stream(endian e)
+    :   m_endian {e}
+    ,   m_buffer { impl::conditional_buffer<OwnsBuffer>::buf() }
 {
     static_assert( OwnsBuffer );
 }
 
-template<endian E , bool OwnsBuffer>
-stream<E , OwnsBuffer>::stream( std::streambuf& b )
-    :   m_buffer { b }
+template<bool OwnsBuffer>
+stream<OwnsBuffer>::stream( std::streambuf& b , endian e )
+    :   m_endian { e }
+    ,   m_buffer { b }
 {
     static_assert( !OwnsBuffer );
 }
 
-template<endian E , bool OwnsBuffer>
-stream<E , OwnsBuffer>::stream( std::ios& ios )
-    :   stream<E , OwnsBuffer> { *ios.rdbuf() }
+template<bool OwnsBuffer>
+stream<OwnsBuffer>::stream( std::ios& ios, endian e )
+    :   stream<OwnsBuffer> { *ios.rdbuf(), e }
 {}
 
-template<endian E , bool OwnsBuffer>
+template<bool OwnsBuffer>
 template<typename T>
-void stream<E , OwnsBuffer>::write( const T& val )
+void stream<OwnsBuffer>::write( const T& val )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
         "T must be a primitive type"
     );
 
-    if constexpr ( E == endian::native )
+    if ( m_endian == endian::native )
     {
         m_buffer.sputn(
             reinterpret_cast<const char*>( &val ) ,
@@ -76,16 +78,16 @@ void stream<E , OwnsBuffer>::write( const T& val )
     }
 }
 
-template<endian E , bool OwnsBuffer>
+template<bool OwnsBuffer>
 template<typename T>
-void stream<E , OwnsBuffer>::write( const T* src , std::size_t n )
+void stream<OwnsBuffer>::write( const T* src , std::size_t n )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
         "T must be a primitive type"
     );
 
-    if constexpr ( E == endian::native )
+    if ( m_endian == endian::native )
     {
         m_buffer.sputn(
             reinterpret_cast<const char*>( src ) ,
@@ -123,16 +125,16 @@ void stream<E , OwnsBuffer>::write( const T* src , std::size_t n )
     }
 }
 
-template<endian E , bool OwnsBuffer>
+template<bool OwnsBuffer>
 template<typename T>
-void stream<E , OwnsBuffer>::read( T& value )
+void stream<OwnsBuffer>::read( T& value )
 {
     static_assert(
         impl::suitable_to_rw_v<T> ,
         "T must be a primitive type"
     );
 
-    if constexpr ( E == endian::native )
+    if ( m_endian == endian::native )
     {
         m_buffer.sgetn(
             reinterpret_cast<char*>( &value ) ,
@@ -155,16 +157,16 @@ void stream<E , OwnsBuffer>::read( T& value )
     }
 }
 
-template<endian E , bool OwnsBuffer>
+template<bool OwnsBuffer>
 template<typename T>
-void stream<E , OwnsBuffer>::read( T* dst , std::size_t n )
+void stream<OwnsBuffer>::read( T* dst , std::size_t n )
 {
     m_buffer.sgetn(
         reinterpret_cast<char*>( dst ) ,
         sizeof( T ) * n
     );
 
-    if constexpr ( E != endian::native )
+    if ( m_endian != endian::native )
         for ( std::size_t i = 0; i < n; ++i )
             std::reverse(
                 reinterpret_cast<char*>( dst ) + i * sizeof( T ) ,
@@ -172,30 +174,42 @@ void stream<E , OwnsBuffer>::read( T* dst , std::size_t n )
             );
 }
 
-template<endian E , bool OwnsBuffer , typename T>
+template<bool OwnsBuffer>
+endian stream<OwnsBuffer>::byte_order() const
+{
+    return m_endian;
+}
+
+template<bool OwnsBuffer>
+void stream<OwnsBuffer>::byte_order( endian x )
+{
+    m_endian = x;
+}
+
+template<bool OwnsBuffer , typename T>
 inline
-std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator<<( stream<E , OwnsBuffer>& ss , const T& value )
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator<<( stream<OwnsBuffer>& ss , const T& value )
 {
     ss.write( value );
 
     return ss;
 }
 
-template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+template<bool OwnsBuffer , typename T , std::size_t N>
 inline
-std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator<<( stream<E , OwnsBuffer>& ss , const T(&src)[N] )
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator<<( stream<OwnsBuffer>& ss , const T(&src)[N] )
 {
     ss.template write<T>( src , N );
 
     return ss;
 }
 
-template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+template<bool OwnsBuffer , typename T , std::size_t N>
 inline
-std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator<<( stream<E , OwnsBuffer>& ss , const T(&src)[N] )
+std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator<<( stream<OwnsBuffer>& ss , const T(&src)[N] )
 {
     for ( std::size_t i = 0; i < N; ++i )
         ss << src[ i ];
@@ -203,30 +217,30 @@ operator<<( stream<E , OwnsBuffer>& ss , const T(&src)[N] )
     return ss;
 }
 
-template<endian E , bool OwnsBuffer , typename T>
+template<bool OwnsBuffer , typename T>
 inline
-std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator>>( stream<E , OwnsBuffer>& ss , T& value )
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator>>( stream<OwnsBuffer>& ss , T& value )
 {
     ss.read( value );
 
     return ss;
 }
 
-template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+template<bool OwnsBuffer , typename T , std::size_t N>
 inline
-std::enable_if_t<impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator>>( stream<E , OwnsBuffer>& ss , T(&src)[ N ] )
+std::enable_if_t<impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator>>( stream<OwnsBuffer>& ss , T(&src)[ N ] )
 {
     ss.template read<T>( src , N );
 
     return ss;
 }
 
-template<endian E , bool OwnsBuffer , typename T , std::size_t N>
+template<bool OwnsBuffer , typename T , std::size_t N>
 inline
-std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<E , OwnsBuffer>&>
-operator>>( stream<E , OwnsBuffer>& ss , T(&src)[ N ] )
+std::enable_if_t<!impl::suitable_to_rw_v<T> , stream<OwnsBuffer>&>
+operator>>( stream<OwnsBuffer>& ss , T(&src)[ N ] )
 {
     for ( std::size_t i = 0; i < N; ++i )
         ss >> src[ i ];

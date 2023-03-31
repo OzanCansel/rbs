@@ -24,7 +24,7 @@ struct foo
 
 TEST_CASE( "write a char" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss.write( char( 0x05 ) );
     REQUIRE( size( ss ) == 1 );
@@ -33,7 +33,7 @@ TEST_CASE( "write a char" )
 
 TEST_CASE( "write two chars" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss.write( char( 0x05 ) );
     ss.write( char( 0x06 ) );
@@ -45,7 +45,7 @@ TEST_CASE( "write two chars" )
 
 TEST_CASE( "write a be short" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss.write( short( 0xABCD ) );
 
@@ -56,7 +56,7 @@ TEST_CASE( "write a be short" )
 
 TEST_CASE( "write a be int" )
 {
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss.write( 0x12345678 );
 
@@ -77,7 +77,7 @@ TEST_CASE( "write a be float" )
 
     mem.value = 2342.23421f;
 
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << mem.value;
 
@@ -104,7 +104,7 @@ TEST_CASE( "write a be double" )
 
     mem.value = 2342.23421;
 
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << mem.value;
 
@@ -127,7 +127,7 @@ TEST_CASE( "write a be double" )
 
 TEST_CASE( "write a le short" )
 {
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss.write( short( 0xABCD ) );
 
@@ -138,7 +138,7 @@ TEST_CASE( "write a le short" )
 
 TEST_CASE( "write a le int" )
 {
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss.write( 0x12345678 );
 
@@ -159,7 +159,7 @@ TEST_CASE( "write a le float" )
 
     mem.value = 2342.23421f;
 
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << mem.value;
 
@@ -186,7 +186,7 @@ TEST_CASE( "write a le double" )
 
     mem.value = 2342.23421;
 
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << mem.value;
 
@@ -217,7 +217,7 @@ TEST_CASE( "write a native short" )
 
     mem.value = 0x1234;
 
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << mem.value;
 
@@ -236,7 +236,7 @@ TEST_CASE( "write a native int" )
 
     mem.value = 0x12345678;
 
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << mem.value;
 
@@ -257,7 +257,7 @@ TEST_CASE( "write a native float" )
 
     mem.value = 2342.23421f;
 
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << mem.value;
 
@@ -278,7 +278,7 @@ TEST_CASE( "write a native double" )
 
     mem.value = 2342.23421;
 
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << mem.value;
 
@@ -297,7 +297,7 @@ TEST_CASE( "write char array" )
 {
     char data[ 4 ] { 0x01 , 0x02 , 0x03 ,0x04 };
 
-    rbs::nt_stream ss;
+    rbs::stream ss { rbs::endian::native };
 
     ss << data;
 
@@ -312,7 +312,7 @@ TEST_CASE( "write be short array" )
 {
     short data[ 4 ] { 0x0102 , 0x0304 , 0x0506 ,0x0708 };
 
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << data;
 
@@ -331,7 +331,7 @@ TEST_CASE( "write le short array" )
 {
     short data[ 4 ] { 0x0102 , 0x0304 , 0x0506 ,0x0708 };
 
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << data;
 
@@ -357,7 +357,7 @@ TEST_CASE( "write nt short array" )
     short numbers[ 4 ] { 0x0102 , 0x0304 , 0x0506 , 0x0708 };
     raw*  numbers_raw { reinterpret_cast<raw*>( numbers ) };
 
-    rbs::le_stream ss;
+    rbs::stream ss { rbs::endian::little };
 
     ss << numbers;
 
@@ -383,7 +383,7 @@ TEST_CASE( "write be custom type array" )
     };
 
 
-    rbs::be_stream ss;
+    rbs::stream ss { rbs::endian::big };
 
     ss << foos;
 
@@ -402,10 +402,39 @@ TEST_CASE( "write be custom type array" )
     REQUIRE( nth_byte( ss , 11 ) == 0x08 );
 }
 
+TEST_CASE( "write one be short one le short" )
+{
+    short value_1 { 0x0102 };
+    short value_2 { 0x0304 };
+
+    rbs::stream ss { rbs::endian::big };
+
+    ss << value_1;
+
+    ss.byte_order(rbs::endian::little);
+
+    ss << value_2;
+
+    REQUIRE( size( ss ) == 4 );
+    REQUIRE( nth_byte( ss , 0 ) == 0x01 );
+    REQUIRE( nth_byte( ss , 1 ) == 0x02 );
+    REQUIRE( nth_byte( ss , 2 ) == 0x04 );
+    REQUIRE( nth_byte( ss , 3 ) == 0x03 );
+}
+
+TEST_CASE( "stream<OwnsBuffer>::byte_order test" )
+{
+    rbs::stream ss { rbs::endian::big };
+
+    REQUIRE(ss.byte_order() == rbs::endian::big );
+    ss.byte_order(rbs::endian::little);
+    REQUIRE(ss.byte_order() == rbs::endian::little );
+}
+
 TEST_CASE( "stream<E>::buffer as reference" )
 {
     boost::asio::streambuf buffer;
-    rbs::nt_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::native };
 
     ss << 1;
 
@@ -418,7 +447,7 @@ TEST_CASE( "Read char" )
 
     buffer.sputc( 0xAB );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     std::uint8_t val;
 
@@ -434,7 +463,7 @@ TEST_CASE( "Read be short" )
     buffer.sputc( 0x0B );
     buffer.sputc( 0xCD );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     short val;
 
@@ -452,7 +481,7 @@ TEST_CASE( "Read be int" )
     buffer.sputc( 0x45 );
     buffer.sputc( 0x67 );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     int val;
 
@@ -486,7 +515,7 @@ TEST_CASE( "Read be float" )
     
     buffer.sputn( endian_converted , sizeof( endian_converted ) );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     float value;
 
@@ -520,7 +549,7 @@ TEST_CASE( "Read be double" )
     
     buffer.sputn( endian_converted , sizeof( endian_converted ) );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     double value;
 
@@ -536,7 +565,7 @@ TEST_CASE( "Read le short" )
     buffer.sputc( 0xCD );
     buffer.sputc( 0x0B );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     short val;
 
@@ -554,7 +583,7 @@ TEST_CASE( "Read le int" )
     buffer.sputc( 0x23 );
     buffer.sputc( 0x01 );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     int val;
 
@@ -588,7 +617,7 @@ TEST_CASE( "Read le float" )
     
     buffer.sputn( endian_converted , sizeof( endian_converted ) );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     float value;
 
@@ -622,7 +651,7 @@ TEST_CASE( "Read le double" )
     
     buffer.sputn( endian_converted , sizeof( endian_converted ) );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     double value;
 
@@ -643,7 +672,7 @@ TEST_CASE( "Read nt short" )
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 
-    rbs::nt_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::native };
 
     short val;
 
@@ -664,7 +693,7 @@ TEST_CASE( "Read nt int" )
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 
-    rbs::nt_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::native };
 
     int val;
 
@@ -685,7 +714,7 @@ TEST_CASE( "Read nt float" )
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 
-    rbs::nt_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::native };
 
     float value;
 
@@ -706,7 +735,7 @@ TEST_CASE( "Read nt double" )
 
     buffer.sputn( memory.data , sizeof( memory.data ) );
 
-    rbs::nt_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::native };
 
     double value;
 
@@ -723,7 +752,7 @@ TEST_CASE( "Read char array" )
     buffer.sputc( 0x02 );
     buffer.sputc( 0x03 );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     char val[ 3 ];
 
@@ -745,7 +774,7 @@ TEST_CASE( "Read be short array" )
     buffer.sputc( 0x05 );
     buffer.sputc( 0x06 );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     std::uint16_t val[ 3 ];
 
@@ -767,7 +796,7 @@ TEST_CASE( "Read le short array" )
     buffer.sputc( 0x06 );
     buffer.sputc( 0x05 );
 
-    rbs::le_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::little };
 
     short val[ 3 ];
 
@@ -795,7 +824,7 @@ TEST_CASE( "read be custom type array" )
     buffer.sputc( 0x07 );
     buffer.sputc( 0x08 );
 
-    rbs::be_stream ss { buffer };
+    rbs::stream ss { buffer , rbs::endian::big };
 
     foo foos[ 4 ];
     ss >> foos;

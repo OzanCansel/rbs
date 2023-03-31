@@ -6,7 +6,7 @@ namespace rbs
 template<typename T>
 void serialize_be( const T& val , std::streambuf& buffer )
 {
-    be_stream bes { buffer };
+    stream bes { buffer , rbs::endian::big };
 
     bes << val;
 }
@@ -14,7 +14,7 @@ void serialize_be( const T& val , std::streambuf& buffer )
 template<typename T>
 void serialize_be( const T& val , std::ios& buffer )
 {
-    be_stream bes { buffer };
+    stream bes { buffer , rbs::endian::big };
 
     bes << val;
 }
@@ -22,7 +22,7 @@ void serialize_be( const T& val , std::ios& buffer )
 template<typename T>
 void serialize_le( const T& val , std::streambuf& buffer )
 {
-    le_stream les { buffer };
+    stream les { buffer , rbs::endian::little };
 
     les << val;
 }
@@ -30,7 +30,7 @@ void serialize_le( const T& val , std::streambuf& buffer )
 template<typename T>
 void serialize_le( const T& val , std::ios& buffer )
 {
-    le_stream les { buffer };
+    stream les { buffer , rbs::endian::little };
 
     les << val;
 }
@@ -38,7 +38,7 @@ void serialize_le( const T& val , std::ios& buffer )
 template<typename T>
 void serialize_nt( const T& val , std::streambuf& buffer )
 {
-    nt_stream nts { buffer };
+    stream nts { buffer , rbs::endian::native };
 
     nts << val;
 }
@@ -46,7 +46,7 @@ void serialize_nt( const T& val , std::streambuf& buffer )
 template<typename T>
 void serialize_nt( const T& val , std::ios& buffer )
 {
-    nt_stream nts { buffer };
+    stream nts { buffer , rbs::endian::native };
 
     nts << val;
 }

@@ -3,7 +3,7 @@
 
 int main()
 {
-    rbs::be_stream bes;
+    rbs::stream bes  { rbs::endian::big };
 
     bes << char( 0x1F )
         << short( 0x0102 )
@@ -11,7 +11,7 @@ int main()
         << float( 1234.56789f )
         << double( 123456789.123456789 );
 
-    rbs::le_stream les;
+    rbs::stream les { rbs::endian::little };
 
     les << char( 0x1F )
         << short( 0x0102 )
@@ -19,7 +19,7 @@ int main()
         << float( 1234.56789f )
         << double( 123456789.123456789 );
 
-    rbs::nt_stream nts;
+    rbs::stream nts  { rbs::endian::native };
 
     nts << char( 0x1F )
         << short( 0x0102 )
